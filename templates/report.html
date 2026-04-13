@@ -1,186 +1,641 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Inspection Report | Class A Fix</title>
+  <meta charset="utf-8">
+  <title>Inspection & Maintenance Report</title>
+  <style>
+    :root{
+      --white:#FFFFFF;
+      --panel:#F7F9FB;
+      --border:#E3E7ED;
+      --text:#1F2933;
+      --muted:#6B7280;
+      --strong:#111827;
+      --blue:#2F6FED;
+      --urgent-bg:#FEE4E2;
+      --urgent-text:#B42318;
+      --recommended-bg:#FEF3E2;
+      --recommended-text:#B54708;
+      --optional-bg:#F2F4F7;
+      --optional-text:#344054;
+      --radius:8px;
+      --shadow:0px 1px 2px rgba(16, 24, 40, 0.05);
+    }
 
-<style>
-:root{
-  --brand:#0077B6;
-  --light:#F5F7FA;
-  --border:#D0D7DE;
-  --radius:12px;
-}
+    @page{
+      size:A4;
+      margin:12mm;
+    }
 
-body{
-  margin:0;
-  font-family: Helvetica, Arial, sans-serif;
-  background:var(--light);
-  color:#222;
-}
+    *{
+      box-sizing:border-box;
+    }
 
-.page{
-  max-width:900px;
-  margin:40px auto;
-}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:var(--white);
+      font-size:10pt;
+      line-height:1.5;
+    }
 
-.card{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:20px;
-  margin-bottom:20px;
-}
+    .page{
+      width:100%;
+    }
 
-h1{
-  margin:0 0 20px 0;
-  color:var(--brand);
-}
+    .page-break{
+      page-break-before:always;
+      break-before:page;
+    }
 
-.section-title{
-  font-size:15px;
-  font-weight:700;
-  margin-bottom:12px;
-  color:var(--brand);
-}
+    .section-space{
+      height:24px;
+    }
 
-label{
-  font-weight:700;
-  display:block;
-  margin-top:12px;
-}
+    .card{
+      background:var(--white);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
 
-input[type="text"],
-input[type="date"],
-select,
-textarea{
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  font-size:14px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  box-sizing:border-box;
-  background:#fff;
-}
+    .header{
+      display:flex;
+      justify-content:space-between;
+      gap:24px;
+      align-items:flex-start;
+      padding-bottom:16px;
+      border-bottom:1px solid var(--border);
+    }
 
-textarea{
-  resize:vertical;
-}
+    .header-left{
+      display:flex;
+      gap:16px;
+      align-items:center;
+    }
 
-.radio-group{
-  display:flex;
-  flex-wrap:wrap;
-  gap:20px;
-  margin-top:10px;
-}
+    .header-logo{
+      width:120px;
+      height:auto;
+      object-fit:contain;
+    }
 
-.radio-group label{
-  font-weight:400;
-  margin-top:0;
-}
+    .header-title{
+      font-size:22pt;
+      line-height:1.1;
+      font-weight:700;
+      color:var(--strong);
+      margin:0 0 6px 0;
+    }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
+    .header-subtitle{
+      color:var(--blue);
+      font-size:10pt;
+      font-weight:700;
+      margin:0;
+    }
 
-.upload{
-  margin-top:10px;
-}
+    .header-right{
+      min-width:210px;
+      text-align:right;
+    }
 
-button{
-  background:var(--brand);
-  color:#fff;
-  font-size:16px;
-  font-weight:700;
-  padding:14px 26px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
+    .meta-line{
+      margin:0 0 6px 0;
+      color:var(--muted);
+      font-size:9pt;
+    }
 
-@media (max-width: 700px){
-  .page{margin:16px;}
-  .grid{grid-template-columns:1fr;}
-  .radio-group{flex-direction:column;gap:10px;}
-}
-</style>
+    .meta-line strong{
+      color:var(--strong);
+    }
+
+    .company-lines{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:9pt;
+      line-height:1.55;
+    }
+
+    .property-card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px;
+    }
+
+    .property-address{
+      margin:0 0 14px 0;
+      font-size:16pt;
+      color:var(--strong);
+      font-weight:700;
+    }
+
+    .property-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px 24px;
+    }
+
+    .info-row{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:8px;
+      align-items:start;
+    }
+
+    .label{
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .value{
+      color:var(--muted);
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(6, 1fr);
+      gap:12px;
+    }
+
+    .summary-card{
+      text-align:center;
+      padding:16px 12px;
+    }
+
+    .summary-number{
+      font-size:18pt;
+      font-weight:700;
+      color:var(--strong);
+      margin:0 0 6px 0;
+    }
+
+    .summary-label{
+      font-size:9pt;
+      color:var(--muted);
+      margin:0;
+    }
+
+    .section-title{
+      margin:0 0 12px 0;
+      font-size:14pt;
+      font-weight:700;
+      color:var(--blue);
+    }
+
+    .issue-card{
+      page-break-inside:avoid;
+      break-inside:avoid;
+      margin-bottom:18px;
+    }
+
+    .issue-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:8px;
+    }
+
+    .issue-title{
+      margin:0;
+      font-size:13pt;
+      color:var(--strong);
+      font-weight:700;
+    }
+
+    .issue-location{
+      margin:6px 0 0 0;
+      color:var(--muted);
+      font-size:9pt;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:9pt;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .status-urgent{
+      background:var(--urgent-bg);
+      color:var(--urgent-text);
+    }
+
+    .status-recommended{
+      background:var(--recommended-bg);
+      color:var(--recommended-text);
+    }
+
+    .status-optional{
+      background:var(--optional-bg);
+      color:var(--optional-text);
+    }
+
+    .photos{
+      margin:16px 0 18px 0;
+      gap:10px;
+      display:grid;
+    }
+
+    .photos img{
+      width:100%;
+      border-radius:8px;
+      object-fit:cover;
+      background:var(--panel);
+      border:1px solid var(--border);
+    }
+
+    .photos-1{
+      grid-template-columns:1fr;
+    }
+
+    .photos-1 img{
+      height:270px;
+    }
+
+    .photos-2{
+      grid-template-columns:1fr 1fr;
+    }
+
+    .photos-2 img{
+      height:200px;
+    }
+
+    .photos-4{
+      grid-template-columns:1fr 1fr;
+    }
+
+    .photos-4 img{
+      height:180px;
+    }
+
+    .content-block{
+      margin-bottom:16px;
+    }
+
+    .content-label{
+      display:block;
+      font-weight:700;
+      color:var(--text);
+      margin-bottom:6px;
+    }
+
+    .content-text{
+      color:var(--muted);
+      margin:0;
+    }
+
+    .scope-list{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+    }
+
+    .scope-list li{
+      margin-bottom:4px;
+    }
+
+    .price-box{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:14px 16px;
+      margin-top:8px;
+    }
+
+    .price-label{
+      font-weight:700;
+      color:var(--text);
+      margin-bottom:6px;
+    }
+
+    .price-value{
+      font-size:18pt;
+      font-weight:700;
+      color:var(--strong);
+      margin:0 0 4px 0;
+    }
+
+    .price-note{
+      color:var(--muted);
+      font-size:9pt;
+      margin:0;
+    }
+
+    .quote-line{
+      margin-top:14px;
+      padding-top:12px;
+      border-top:1px solid var(--border);
+      color:var(--blue);
+      font-weight:700;
+      font-size:9.5pt;
+    }
+
+    .table-card{
+      padding:0;
+      overflow:hidden;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    thead th{
+      background:var(--panel);
+      padding:12px 14px;
+      text-align:left;
+      font-size:9pt;
+      color:var(--text);
+      border-bottom:1px solid var(--border);
+    }
+
+    tbody td{
+      padding:12px 14px;
+      vertical-align:top;
+      border-bottom:1px solid var(--border);
+      color:var(--muted);
+      font-size:9pt;
+    }
+
+    tbody tr:last-child td{
+      border-bottom:none;
+    }
+
+    .table-price{
+      color:var(--strong);
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .totals{
+      margin-top:18px;
+      margin-left:auto;
+      width:340px;
+    }
+
+    .total-row{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      padding:10px 0;
+      border-bottom:1px solid var(--border);
+      color:var(--text);
+    }
+
+    .total-row strong{
+      color:var(--strong);
+    }
+
+    .grand-total{
+      margin-top:12px;
+      padding:16px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      background:var(--panel);
+    }
+
+    .grand-total-label{
+      margin:0 0 8px 0;
+      color:var(--text);
+      font-weight:700;
+    }
+
+    .grand-total-value{
+      margin:0;
+      font-size:20pt;
+      color:var(--strong);
+      font-weight:700;
+    }
+
+    .timeframe-line{
+      margin-top:18px;
+      font-size:10pt;
+      color:var(--text);
+    }
+
+    .closing-note{
+      margin-top:16px;
+      color:var(--muted);
+      font-size:9.5pt;
+      line-height:1.6;
+    }
+  </style>
 </head>
-
 <body>
-<div class="page">
+  <div class="page">
+    <div class="header">
+      <div class="header-left">
+        {% if logo_url %}
+        <img src="{{ logo_url }}" alt="Logo" class="header-logo">
+        {% endif %}
+        <div>
+          <h1 class="header-title">inspection &amp; maintenance report</h1>
+          <p class="header-subtitle">{{ company_name or "Class A Fix" }}</p>
+          <div class="company-lines">
+            {% if company_phone %}<div>{{ company_phone }}</div>{% endif %}
+            {% if company_email %}<div>{{ company_email }}</div>{% endif %}
+            {% if company_website %}<div>{{ company_website }}</div>{% endif %}
+            {% if company_abn %}<div>ABN {{ company_abn }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
 
-<form action="/generate" method="post" enctype="multipart/form-data">
-
-  <div class="card">
-    <h1>Inspection Report</h1>
-
-    <div class="grid">
-      <div>
-        <label>Property address</label>
-        <input type="text" name="property_address" required>
-      </div>
-      <div>
-        <label>Inspection date</label>
-        <input type="date" name="inspection_date" required>
-      </div>
-      <div>
-        <label>Real estate agency</label>
-        <input type="text" name="agency">
-      </div>
-      <div>
-        <label>Property manager</label>
-        <input type="text" name="property_manager">
-      </div>
-      <div>
-        <label>Inspector name</label>
-        <input type="text" name="inspector_name" required>
-      </div>
-      <div>
-        <label>Tenant status</label>
-        <select name="tenant_status">
-          <option value="Tenant present">Tenant present</option>
-          <option value="Tenant absent">Tenant absent</option>
-          <option value="Vacant property">Vacant property</option>
-        </select>
+      <div class="header-right">
+        <p class="meta-line"><strong>report reference</strong><br>{{ report_reference }}</p>
+        <p class="meta-line"><strong>date</strong><br>{{ generated_date }}</p>
       </div>
     </div>
 
-    <label>Overall summary</label>
-    <textarea name="overall_summary" rows="4" placeholder="High level inspection summary"></textarea>
-  </div>
+    <div class="section-space"></div>
 
-  {% for section in sections %}
-  <div class="card">
-    <div class="section-title">{{ section.name }}</div>
-
-    <label>Status</label>
-    <div class="radio-group">
-      <label><input type="radio" name="{{ section.key }}_status" value="Good" required> Good</label>
-      <label><input type="radio" name="{{ section.key }}_status" value="Monitor"> Monitor</label>
-      <label><input type="radio" name="{{ section.key }}_status" value="Needs attention"> Needs attention</label>
-      <label><input type="radio" name="{{ section.key }}_status" value="Not inspected"> Not inspected</label>
+    <div class="property-card">
+      <h2 class="property-address">{{ property_address }}</h2>
+      <div class="property-grid">
+        <div class="info-row"><div class="label">agency</div><div class="value">{{ agency or "-" }}</div></div>
+        <div class="info-row"><div class="label">requested by</div><div class="value">{{ requested_by or "-" }}</div></div>
+        <div class="info-row"><div class="label">work order</div><div class="value">{{ work_order or "-" }}</div></div>
+        <div class="info-row"><div class="label">inspection date</div><div class="value">{{ inspection_date or "-" }}</div></div>
+        <div class="info-row"><div class="label">priority</div><div class="value">{{ priority or "-" }}</div></div>
+        <div class="info-row"><div class="label">client name</div><div class="value">{{ client_name or "-" }}</div></div>
+        <div class="info-row"><div class="label">tenant name</div><div class="value">{{ tenant_name or "-" }}</div></div>
+        <div class="info-row"><div class="label">job number</div><div class="value">{{ job_number or "-" }}</div></div>
+      </div>
     </div>
 
-    <label>Condition summary</label>
-    <input type="text" name="{{ section.key }}_condition" placeholder="Short summary for this section">
+    <div class="section-space"></div>
 
-    <label>Notes</label>
-    <textarea name="{{ section.key }}_notes" rows="3" placeholder="Detailed observations, defects, recommendations"></textarea>
+    <div class="summary-grid">
+      <div class="card summary-card">
+        <p class="summary-number">{{ total_issues }}</p>
+        <p class="summary-label">total issues</p>
+      </div>
+      <div class="card summary-card">
+        <p class="summary-number">{{ urgent_count }}</p>
+        <p class="summary-label">urgent</p>
+      </div>
+      <div class="card summary-card">
+        <p class="summary-number">{{ recommended_count }}</p>
+        <p class="summary-label">recommended</p>
+      </div>
+      <div class="card summary-card">
+        <p class="summary-number">{{ optional_count }}</p>
+        <p class="summary-label">optional</p>
+      </div>
+      <div class="card summary-card">
+        <p class="summary-number">{{ total_estimated_cost }}</p>
+        <p class="summary-label">total estimate</p>
+      </div>
+      <div class="card summary-card">
+        <p class="summary-number" style="font-size:13pt;">{{ estimated_timeframe }}</p>
+        <p class="summary-label">timeframe</p>
+      </div>
+    </div>
 
-    <label>Photos</label>
-    <input class="upload" type="file" name="{{ section.key }}_photos" multiple accept="image/*" capture="environment">
+    <div class="section-space" style="height:32px;"></div>
+
+    <h2 class="section-title">issue details</h2>
+
+    {% for issue in issues %}
+    <div class="card issue-card">
+      <div class="issue-head">
+        <div>
+          <h3 class="issue-title">Issue {{ issue.number }}: {{ issue.title }}</h3>
+          <p class="issue-location">{{ issue.location }}</p>
+        </div>
+        <span class="badge {{ issue.status_style }}">{{ issue.status }}</span>
+      </div>
+
+      {% if issue.photos %}
+      <div class="photos {{ issue.photo_layout }}">
+        {% for photo in issue.photos %}
+        <img src="{{ photo }}" alt="Issue photo {{ loop.index }}">
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="content-block">
+        <span class="content-label">Observed condition</span>
+        <p class="content-text">{{ issue.observed_condition }}</p>
+      </div>
+
+      <div class="content-block">
+        <span class="content-label">Recommended action</span>
+        <p class="content-text">{{ issue.recommended_action }}</p>
+      </div>
+
+      <div class="content-block">
+        <span class="content-label">Included works</span>
+        {% if issue.scope_items %}
+        <ul class="scope-list">
+          {% for item in issue.scope_items %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="content-text">No included works listed.</p>
+        {% endif %}
+      </div>
+
+      <div class="content-block">
+        <span class="content-label">Item price</span>
+        <div class="price-box">
+          <p class="price-value">{{ issue.price }}</p>
+          <p class="price-note">{{ issue.pricing_note }}</p>
+        </div>
+      </div>
+
+      <div class="quote-line">{{ issue.quote_status_text }}</div>
+    </div>
+    {% endfor %}
+
+    <div class="page-break"></div>
+
+    <h2 class="section-title">combined quote summary</h2>
+
+    <div class="card table-card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:18%;">item</th>
+            <th>description</th>
+            <th style="width:20%;">location</th>
+            <th style="width:14%;">price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in included_quote_items %}
+          <tr>
+            <td>{{ item.item }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.location }}</td>
+            <td class="table-price">{{ item.price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if has_optional_items %}
+    <div class="section-space"></div>
+    <h2 class="section-title">optional items</h2>
+
+    <div class="card table-card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:18%;">item</th>
+            <th>description</th>
+            <th style="width:20%;">location</th>
+            <th style="width:14%;">price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in optional_quote_items %}
+          <tr>
+            <td>{{ item.item }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.location }}</td>
+            <td class="table-price">{{ item.price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <div class="totals">
+      <div class="total-row">
+        <span>subtotal</span>
+        <strong>{{ subtotal }}</strong>
+      </div>
+      {% if has_optional_items %}
+      <div class="total-row">
+        <span>optional subtotal</span>
+        <strong>{{ optional_subtotal }}</strong>
+      </div>
+      {% endif %}
+      <div class="grand-total">
+        <p class="grand-total-label">TOTAL ESTIMATED COST</p>
+        <p class="grand-total-value">{{ total_estimated_cost }}</p>
+      </div>
+    </div>
+
+    <div class="timeframe-line">
+      <strong>estimated timeframe:</strong> {{ estimated_timeframe }}
+    </div>
+
+    <div class="closing-note">
+      pricing is based on the inspection completed at the time of reporting. costs may vary if additional issues are found once works commence or concealed conditions are uncovered during repairs.
+    </div>
   </div>
-  {% endfor %}
-
-  <div class="card">
-    <button type="submit">Generate PDF</button>
-  </div>
-
-</form>
-
-</div>
 </body>
 </html>
