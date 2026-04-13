@@ -1,6 +1,8 @@
 import os
+import re
 import uuid
 import shutil
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from datetime import datetime
 
@@ -15,6 +17,7 @@ from playwright.async_api import async_playwright
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "/ms-playwright"
 os.environ["PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"] = "1"
 
+
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
@@ -24,199 +27,314 @@ REPORTS_DIR.mkdir(exist_ok=True)
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 app.mount("/reports", StaticFiles(directory=REPORTS_DIR), name="reports")
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 
-INSPECTION_SECTIONS = [
-    {
-        "key": "external",
-        "name": "External areas",
-        "checklist": [
-            "Walls, roofline and visible external surfaces checked",
-            "Paths, access points and entry conditions reviewed",
-            "General presentation and visible defects noted"
-        ]
-    },
-    {
-        "key": "entry_living",
-        "name": "Entry and living areas",
-        "checklist": [
-            "Walls, ceilings and flooring visually checked",
-            "Doors, windows and basic fittings reviewed",
-            "Signs of damage, wear or maintenance issues noted"
-        ]
-    },
-    {
-        "key": "kitchen",
-        "name": "Kitchen",
-        "checklist": [
-            "Cabinetry, benchtops and sink area reviewed",
-            "Appliances and fixtures visually checked",
-            "Leaks, damage or cleanliness issues noted"
-        ]
-    },
-    {
-        "key": "bathroom",
-        "name": "Bathroom",
-        "checklist": [
-            "Shower, vanity, toilet and fittings reviewed",
-            "Tiling, seals and visible moisture issues checked",
-            "Ventilation and general condition noted"
-        ]
-    },
-    {
-        "key": "bedrooms",
-        "name": "Bedrooms",
-        "checklist": [
-            "Walls, flooring and wardrobes reviewed",
-            "Windows, blinds and doors visually checked",
-            "General condition and visible issues noted"
-        ]
-    },
-    {
-        "key": "laundry",
-        "name": "Laundry",
-        "checklist": [
-            "Taps, trough and connections reviewed",
-            "Drainage and visible water issues checked",
-            "General condition noted"
-        ]
-    },
-    {
-        "key": "electrical",
-        "name": "Electrical and lighting",
-        "checklist": [
-            "Visible switches, lights and power points reviewed",
-            "Obvious damage or safety concerns noted",
-            "Any inaccessible items recorded in notes"
-        ]
-    },
-    {
-        "key": "plumbing",
-        "name": "Plumbing",
-        "checklist": [
-            "Visible taps, fixtures and drainage points reviewed",
-            "Leaks, pressure concerns or damage noted",
-            "Water related observations recorded"
-        ]
-    },
-    {
-        "key": "safety",
-        "name": "Safety items",
-        "checklist": [
-            "Smoke alarms and visible safety items reviewed",
-            "Trip hazards or immediate safety concerns noted",
-            "Any urgent follow up recorded"
-        ]
-    },
-    {
-        "key": "general_defects",
-        "name": "General defects and recommendations",
-        "checklist": [
-            "Outstanding defects captured",
-            "Recommended repairs or follow up noted",
-            "Photo evidence attached where relevant"
-        ]
-    }
-]
+VALID_STATUSES = {"urgent", "recommended", "optional"}
+
+
+def slugify(value: str) -> str:
+    value = (value or "").strip().lower()
+    value = re.sub(r"[^a-z0-9]+", "_", value)
+    value = re.sub(r"_+", "_", value).strip("_")
+    return value or "property"
+
+
+def format_currency(amount: Decimal) -> str:
+    return f"${amount:,.2f}"
+
+
+def parse_money(value: str) -> Decimal:
+    cleaned = (value or "").replace("$", "").replace(",", "").strip()
+    if not cleaned:
+        raise InvalidOperation("Price is blank")
+    return Decimal(cleaned)
+
+
+def safe_text(value: str) -> str:
+    return (value or "").strip()
+
+
+def error_page(message: str) -> HTMLResponse:
+    return HTMLResponse(
+        content=f"""
+        <!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <title>Validation Error</title>
+          <style>
+            body {{
+              font-family: Arial, Helvetica, sans-serif;
+              background: #F7F9FB;
+              margin: 0;
+              padding: 40px 20px;
+              color: #1F2933;
+            }}
+            .card {{
+              max-width: 760px;
+              margin: 0 auto;
+              background: #FFFFFF;
+              border: 1px solid #E3E7ED;
+              border-radius: 12px;
+              padding: 24px;
+            }}
+            h1 {{
+              margin: 0 0 12px 0;
+              font-size: 24px;
+            }}
+            p {{
+              margin: 0 0 16px 0;
+              line-height: 1.5;
+              color: #6B7280;
+            }}
+            a {{
+              display: inline-block;
+              background: #2F6FED;
+              color: white;
+              text-decoration: none;
+              padding: 12px 16px;
+              border-radius: 8px;
+              font-weight: 700;
+            }}
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <h1>please fix the form</h1>
+            <p>{message}</p>
+            <a href="/">go back</a>
+          </div>
+        </body>
+        </html>
+        """,
+        status_code=400,
+    )
 
 
 @app.get("/", response_class=HTMLResponse)
 async def form(request: Request):
-    return templates.TemplateResponse(
-        "form.html",
-        {"request": request, "sections": INSPECTION_SECTIONS}
-    )
+    return templates.TemplateResponse("form.html", {"request": request})
 
 
 @app.post("/generate")
 async def generate_report(request: Request):
     form = await request.form()
 
-    report_id = f"INSP-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6]}"
-    report_dir = REPORTS_DIR / report_id
+    property_address = safe_text(form.get("property_address"))
+    agency = safe_text(form.get("agency"))
+    requested_by = safe_text(form.get("requested_by"))
+    work_order = safe_text(form.get("work_order"))
+    inspection_date = safe_text(form.get("inspection_date"))
+    priority = safe_text(form.get("priority"))
+    client_name = safe_text(form.get("client_name"))
+    tenant_name = safe_text(form.get("tenant_name"))
+    job_number = safe_text(form.get("job_number"))
+    estimated_timeframe = safe_text(form.get("estimated_timeframe"))
+
+    company_name = safe_text(form.get("company_name"))
+    company_phone = safe_text(form.get("company_phone"))
+    company_email = safe_text(form.get("company_email"))
+    company_website = safe_text(form.get("company_website"))
+    company_abn = safe_text(form.get("company_abn"))
+
+    if not property_address:
+        return error_page("property address is required.")
+    if not agency:
+        return error_page("agency is required.")
+    if not inspection_date:
+        return error_page("inspection date is required.")
+    if not estimated_timeframe:
+        return error_page("estimated timeframe is required.")
+
+    try:
+        issue_count = int(form.get("issue_count", "0"))
+    except ValueError:
+        issue_count = 0
+
+    if issue_count < 1:
+        return error_page("add at least one issue before generating the report.")
+
+    report_reference = f"IR-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+    report_dir = REPORTS_DIR / report_reference
     report_dir.mkdir(exist_ok=True)
 
-    sections = []
-    table_rows = []
-    all_photos = []
-    attention_required_count = 0
+    issues = []
+    included_quote_items = []
+    optional_quote_items = []
 
-    for section_def in INSPECTION_SECTIONS:
-        key = section_def["key"]
+    urgent_count = 0
+    recommended_count = 0
+    optional_count = 0
 
-        status = form.get(f"{key}_status") or "Good"
-        condition = form.get(f"{key}_condition") or ""
-        note = form.get(f"{key}_notes") or ""
+    subtotal = Decimal("0.00")
+    optional_subtotal = Decimal("0.00")
 
-        status_class = "ok"
-        summary = "No major issue noted"
+    for i in range(issue_count):
+        title = safe_text(form.get(f"issue_{i}_title"))
+        location = safe_text(form.get(f"issue_{i}_location"))
+        status = safe_text(form.get(f"issue_{i}_status")).lower()
+        observed_condition = safe_text(form.get(f"issue_{i}_observed_condition"))
+        recommended_action = safe_text(form.get(f"issue_{i}_recommended_action"))
+        price_raw = safe_text(form.get(f"issue_{i}_price"))
+        pricing_note = safe_text(form.get(f"issue_{i}_pricing_note")) or "Includes labour and materials"
+        include_in_quote = safe_text(form.get(f"issue_{i}_include_in_quote")).lower() == "yes"
+        is_optional_quote_item = safe_text(form.get(f"issue_{i}_optional")).lower() == "yes"
 
-        if status == "Needs attention":
-            status_class = "bad"
-            summary = "Issue identified and follow up recommended"
-            attention_required_count += 1
-        elif status == "Monitor":
-            status_class = "monitor"
-            summary = "Condition should be monitored"
-        elif status == "Not inspected":
-            status_class = "na"
-            summary = "Area was not inspected"
+        scope_items = [
+            safe_text(item)
+            for item in form.getlist(f"issue_{i}_scope")
+            if safe_text(item)
+        ]
 
-        photos = []
-        uploads = form.getlist(f"{key}_photos")
+        uploads = form.getlist(f"issue_{i}_photos")
 
-        for upload in uploads:
-            if upload.filename:
-                safe_name = f"{uuid.uuid4().hex}_{upload.filename}"
-                photo_path = report_dir / safe_name
+        if not title and not location and not observed_condition and not recommended_action and not price_raw and not scope_items and not any(
+            getattr(upload, "filename", "") for upload in uploads
+        ):
+            continue
 
-                with open(photo_path, "wb") as buffer:
-                    shutil.copyfileobj(upload.file, buffer)
+        if status not in VALID_STATUSES:
+            return error_page(f"issue {i + 1} must have a valid status.")
 
-                photo_url = photo_path.resolve().as_uri()
-                photos.append(photo_url)
-                all_photos.append(photo_url)
+        if include_in_quote and not title:
+            return error_page(f"issue {i + 1} is included in the quote but has no title.")
 
-        sections.append({
-            "name": section_def["name"],
-            "checklist": section_def["checklist"],
-            "status": status,
-            "status_class": status_class,
-            "condition": condition,
-            "note": note,
-            "photos": photos,
-        })
+        price_value = Decimal("0.00")
+        if price_raw:
+            try:
+                price_value = parse_money(price_raw)
+            except InvalidOperation:
+                return error_page(f"issue {i + 1} has an invalid price.")
+        elif include_in_quote:
+            return error_page(f"issue {i + 1} is included in the quote but has no price.")
 
-        table_rows.append({
-            "name": section_def["name"],
-            "status": status,
-            "status_class": f"status-{status_class}",
-            "summary": summary,
-        })
+        saved_photos = []
+        valid_uploads = [upload for upload in uploads if getattr(upload, "filename", "")]
+        if len(valid_uploads) > 4:
+            return error_page(f"issue {i + 1} has more than 4 photos. maximum is 4.")
 
-    logo_uri = (STATIC_DIR / "class-a-fix-logo.jpg").resolve().as_uri()
+        for upload in valid_uploads[:4]:
+            original_name = Path(upload.filename).name
+            safe_name = f"{uuid.uuid4().hex}_{original_name}"
+            photo_path = report_dir / safe_name
+
+            with open(photo_path, "wb") as buffer:
+                shutil.copyfileobj(upload.file, buffer)
+
+            saved_photos.append(photo_path.resolve().as_uri())
+
+        if status == "urgent":
+            urgent_count += 1
+        elif status == "recommended":
+            recommended_count += 1
+        elif status == "optional":
+            optional_count += 1
+
+        if include_in_quote:
+            quote_row = {
+                "item": title,
+                "description": recommended_action or title,
+                "location": location or "Not specified",
+                "price": format_currency(price_value),
+                "price_value": price_value,
+            }
+
+            if is_optional_quote_item:
+                optional_quote_items.append(quote_row)
+                optional_subtotal += price_value
+            else:
+                included_quote_items.append(quote_row)
+                subtotal += price_value
+
+        if include_in_quote and is_optional_quote_item:
+            quote_status_text = "Optional item"
+        elif include_in_quote:
+            quote_status_text = "Included in final quote"
+        else:
+            quote_status_text = "Excluded"
+
+        status_style = {
+            "urgent": "status-urgent",
+            "recommended": "status-recommended",
+            "optional": "status-optional",
+        }[status]
+
+        photo_layout = {
+            1: "photos-1",
+            2: "photos-2",
+            3: "photos-4",
+            4: "photos-4",
+        }.get(len(saved_photos), "photos-0")
+
+        issues.append(
+            {
+                "number": len(issues) + 1,
+                "title": title,
+                "location": location or "Not specified",
+                "status": status.title(),
+                "status_style": status_style,
+                "observed_condition": observed_condition or "No observed condition provided.",
+                "recommended_action": recommended_action or "No recommendation provided.",
+                "scope_items": scope_items,
+                "price": format_currency(price_value),
+                "price_value": price_value,
+                "pricing_note": pricing_note,
+                "include_in_quote": include_in_quote,
+                "optional": is_optional_quote_item,
+                "quote_status_text": quote_status_text,
+                "photos": saved_photos,
+                "photo_layout": photo_layout,
+            }
+        )
+
+    if not issues:
+        return error_page("add at least one issue before generating the report.")
+
+    if not included_quote_items and not optional_quote_items:
+        return error_page("at least one issue must be included in the quote.")
+
+    logo_path = STATIC_DIR / "class-a-fix-logo.jpg"
+    logo_url = logo_path.resolve().as_uri() if logo_path.exists() else None
+
+    generated_date = datetime.now().strftime("%d %b %Y")
+    download_name = f"inspection_report_{slugify(property_address)}.pdf"
 
     context = {
-        "property_address": form.get("property_address") or "",
-        "agency": form.get("agency") or "",
-        "inspector_name": form.get("inspector_name") or "",
-        "inspection_date": form.get("inspection_date") or "",
-        "property_manager": form.get("property_manager") or "",
-        "tenant_status": form.get("tenant_status") or "",
-        "overall_summary": form.get("overall_summary") or "",
-        "generated_date": datetime.now().strftime("%d %b %Y"),
-        "reference": report_id,
-        "overall_status": "Pass" if attention_required_count == 0 else "Action required",
-        "areas_checked": len(INSPECTION_SECTIONS),
-        "attention_required_count": attention_required_count,
-        "sections": sections,
-        "table_rows": table_rows,
-        "all_photos": all_photos,
-        "logo_uri": logo_uri,
+        "property_address": property_address,
+        "agency": agency,
+        "requested_by": requested_by,
+        "work_order": work_order,
+        "inspection_date": inspection_date,
+        "priority": priority,
+        "client_name": client_name,
+        "tenant_name": tenant_name,
+        "job_number": job_number,
+        "estimated_timeframe": estimated_timeframe,
+        "company_name": company_name,
+        "company_phone": company_phone,
+        "company_email": company_email,
+        "company_website": company_website,
+        "company_abn": company_abn,
+        "generated_date": generated_date,
+        "report_reference": report_reference,
+        "logo_url": logo_url,
+        "issues": issues,
+        "total_issues": len(issues),
+        "urgent_count": urgent_count,
+        "recommended_count": recommended_count,
+        "optional_count": optional_count,
+        "subtotal": format_currency(subtotal),
+        "optional_subtotal": format_currency(optional_subtotal),
+        "total_estimated_cost": format_currency(subtotal),
+        "included_quote_items": included_quote_items,
+        "optional_quote_items": optional_quote_items,
+        "has_optional_items": len(optional_quote_items) > 0,
     }
 
     html = templates.get_template("report.html").render(context)
@@ -224,7 +342,7 @@ async def generate_report(request: Request):
     html_path = report_dir / "report.html"
     html_path.write_text(html, encoding="utf-8")
 
-    pdf_path = report_dir / f"{report_id}.pdf"
+    pdf_path = report_dir / download_name
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(
@@ -239,7 +357,21 @@ async def generate_report(request: Request):
 
         page = await browser.new_page()
         await page.goto(html_path.resolve().as_uri(), wait_until="networkidle")
-        await page.pdf(path=str(pdf_path), format="A4", print_background=True)
+        await page.pdf(
+            path=str(pdf_path),
+            format="A4",
+            print_background=True,
+            margin={
+                "top": "14mm",
+                "right": "12mm",
+                "bottom": "14mm",
+                "left": "12mm",
+            },
+        )
         await browser.close()
 
-    return FileResponse(pdf_path, media_type="application/pdf", filename=pdf_path.name)
+    return FileResponse(
+        pdf_path,
+        media_type="application/pdf",
+        filename=download_name,
+    )
