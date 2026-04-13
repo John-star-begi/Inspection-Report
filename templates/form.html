@@ -1,186 +1,554 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Inspection Report | Class A Fix</title>
+  <meta charset="utf-8">
+  <title>Inspection & Maintenance Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root{
+      --bg:#F7F9FB;
+      --card:#FFFFFF;
+      --border:#E3E7ED;
+      --text:#1F2933;
+      --muted:#6B7280;
+      --strong:#111827;
+      --blue:#2F6FED;
+      --urgent-bg:#FEE4E2;
+      --urgent-text:#B42318;
+      --recommended-bg:#FEF3E2;
+      --recommended-text:#B54708;
+      --optional-bg:#F2F4F7;
+      --optional-text:#344054;
+      --radius:8px;
+      --shadow:0px 1px 2px rgba(16, 24, 40, 0.05);
+    }
 
-<style>
-:root{
-  --brand:#0077B6;
-  --light:#F5F7FA;
-  --border:#D0D7DE;
-  --radius:12px;
-}
+    *{
+      box-sizing:border-box;
+    }
 
-body{
-  margin:0;
-  font-family: Helvetica, Arial, sans-serif;
-  background:var(--light);
-  color:#222;
-}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-.page{
-  max-width:900px;
-  margin:40px auto;
-}
+    .page{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
 
-.card{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:20px;
-  margin-bottom:20px;
-}
+    .topbar{
+      margin-bottom:24px;
+    }
 
-h1{
-  margin:0 0 20px 0;
-  color:var(--brand);
-}
+    .topbar h1{
+      margin:0 0 8px 0;
+      font-size:32px;
+      line-height:1.15;
+      color:var(--strong);
+    }
 
-.section-title{
-  font-size:15px;
-  font-weight:700;
-  margin-bottom:12px;
-  color:var(--brand);
-}
+    .topbar p{
+      margin:0;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.5;
+      max-width:760px;
+    }
 
-label{
-  font-weight:700;
-  display:block;
-  margin-top:12px;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:var(--shadow);
+      margin-bottom:24px;
+    }
 
-input[type="text"],
-input[type="date"],
-select,
-textarea{
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  font-size:14px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  box-sizing:border-box;
-  background:#fff;
-}
+    .section-title{
+      margin:0 0 16px 0;
+      font-size:18px;
+      color:var(--blue);
+    }
 
-textarea{
-  resize:vertical;
-}
+    .grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
 
-.radio-group{
-  display:flex;
-  flex-wrap:wrap;
-  gap:20px;
-  margin-top:10px;
-}
+    .grid-3{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:16px;
+    }
 
-.radio-group label{
-  font-weight:400;
-  margin-top:0;
-}
+    .field{
+      margin-bottom:16px;
+    }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
+    .field label{
+      display:block;
+      font-weight:700;
+      margin-bottom:8px;
+      font-size:14px;
+    }
 
-.upload{
-  margin-top:10px;
-}
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:6px;
+      line-height:1.4;
+    }
 
-button{
-  background:var(--brand);
-  color:#fff;
-  font-size:16px;
-  font-weight:700;
-  padding:14px 26px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="file"],
+    select,
+    textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:8px;
+      background:#FFFFFF;
+      padding:12px 14px;
+      font-size:14px;
+      color:var(--text);
+    }
 
-@media (max-width: 700px){
-  .page{margin:16px;}
-  .grid{grid-template-columns:1fr;}
-  .radio-group{flex-direction:column;gap:10px;}
-}
-</style>
+    textarea{
+      min-height:110px;
+      resize:vertical;
+      line-height:1.5;
+    }
+
+    .issue-card{
+      background:#FFFFFF;
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:20px;
+      box-shadow:var(--shadow);
+      margin-bottom:24px;
+    }
+
+    .issue-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:16px;
+      padding-bottom:16px;
+      border-bottom:1px solid var(--border);
+    }
+
+    .issue-header h3{
+      margin:0;
+      font-size:20px;
+      color:var(--strong);
+    }
+
+    .issue-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:700;
+      background:#EEF4FF;
+      color:var(--blue);
+    }
+
+    .scope-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .scope-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    .scope-row input{
+      flex:1;
+    }
+
+    .btn{
+      border:none;
+      border-radius:8px;
+      padding:12px 16px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .btn-primary{
+      background:var(--blue);
+      color:#FFFFFF;
+    }
+
+    .btn-secondary{
+      background:#EEF4FF;
+      color:var(--blue);
+    }
+
+    .btn-danger{
+      background:#FFF1F3;
+      color:#C01048;
+    }
+
+    .footer-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .summary-note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .status-guide{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .status-guide .urgent{
+      background:var(--urgent-bg);
+      color:var(--urgent-text);
+    }
+
+    .status-guide .recommended{
+      background:var(--recommended-bg);
+      color:var(--recommended-text);
+    }
+
+    .status-guide .optional{
+      background:var(--optional-bg);
+      color:var(--optional-text);
+    }
+
+    @media (max-width: 860px){
+      .grid-2,
+      .grid-3{
+        grid-template-columns:1fr;
+      }
+
+      .issue-header{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .scope-row{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .scope-row button{
+        width:100%;
+      }
+    }
+  </style>
 </head>
-
 <body>
-<div class="page">
-
-<form action="/generate" method="post" enctype="multipart/form-data">
-
-  <div class="card">
-    <h1>Inspection Report</h1>
-
-    <div class="grid">
-      <div>
-        <label>Property address</label>
-        <input type="text" name="property_address" required>
-      </div>
-      <div>
-        <label>Inspection date</label>
-        <input type="date" name="inspection_date" required>
-      </div>
-      <div>
-        <label>Real estate agency</label>
-        <input type="text" name="agency">
-      </div>
-      <div>
-        <label>Property manager</label>
-        <input type="text" name="property_manager">
-      </div>
-      <div>
-        <label>Inspector name</label>
-        <input type="text" name="inspector_name" required>
-      </div>
-      <div>
-        <label>Tenant status</label>
-        <select name="tenant_status">
-          <option value="Tenant present">Tenant present</option>
-          <option value="Tenant absent">Tenant absent</option>
-          <option value="Vacant property">Vacant property</option>
-        </select>
-      </div>
+  <div class="page">
+    <div class="topbar">
+      <h1>inspection & maintenance report</h1>
+      <p>add property details, add issues one by one, attach up to 4 photos per issue, and generate a clean inspection and quote pdf with an automatic final quote page.</p>
     </div>
 
-    <label>Overall summary</label>
-    <textarea name="overall_summary" rows="4" placeholder="High level inspection summary"></textarea>
+    <form action="/generate" method="post" enctype="multipart/form-data" id="reportForm">
+      <div class="card">
+        <h2 class="section-title">company details</h2>
+        <div class="grid-3">
+          <div class="field">
+            <label for="company_name">company name</label>
+            <input type="text" id="company_name" name="company_name" value="Class A Fix" required>
+          </div>
+          <div class="field">
+            <label for="company_phone">phone</label>
+            <input type="text" id="company_phone" name="company_phone" placeholder="0400 000 000">
+          </div>
+          <div class="field">
+            <label for="company_email">email</label>
+            <input type="text" id="company_email" name="company_email" placeholder="info@classafix.com.au">
+          </div>
+          <div class="field">
+            <label for="company_website">website</label>
+            <input type="text" id="company_website" name="company_website" placeholder="www.classafix.com.au">
+          </div>
+          <div class="field">
+            <label for="company_abn">abn</label>
+            <input type="text" id="company_abn" name="company_abn" placeholder="12 345 678 901">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">property details</h2>
+        <div class="grid-3">
+          <div class="field">
+            <label for="property_address">property address</label>
+            <input type="text" id="property_address" name="property_address" required>
+          </div>
+          <div class="field">
+            <label for="agency">agency</label>
+            <input type="text" id="agency" name="agency" required>
+          </div>
+          <div class="field">
+            <label for="requested_by">requested by</label>
+            <input type="text" id="requested_by" name="requested_by">
+          </div>
+          <div class="field">
+            <label for="work_order">work order</label>
+            <input type="text" id="work_order" name="work_order">
+          </div>
+          <div class="field">
+            <label for="inspection_date">inspection date</label>
+            <input type="date" id="inspection_date" name="inspection_date" required>
+          </div>
+          <div class="field">
+            <label for="priority">priority</label>
+            <select id="priority" name="priority">
+              <option value="Urgent">Urgent</option>
+              <option value="Standard" selected>Standard</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="client_name">client name</label>
+            <input type="text" id="client_name" name="client_name">
+          </div>
+          <div class="field">
+            <label for="tenant_name">tenant name</label>
+            <input type="text" id="tenant_name" name="tenant_name">
+          </div>
+          <div class="field">
+            <label for="job_number">job number</label>
+            <input type="text" id="job_number" name="job_number">
+          </div>
+          <div class="field">
+            <label for="estimated_timeframe">estimated timeframe</label>
+            <input type="text" id="estimated_timeframe" name="estimated_timeframe" placeholder="3 to 5 business days" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">issue status guide</h2>
+        <div class="status-guide">
+          <span class="pill urgent">urgent</span>
+          <span class="pill recommended">recommended</span>
+          <span class="pill optional">optional</span>
+        </div>
+        <p class="summary-note">each issue becomes its own card in the pdf. included issues go into the final quote automatically. optional quote items are listed separately on the final page.</p>
+      </div>
+
+      <input type="hidden" name="issue_count" id="issue_count" value="0">
+
+      <div class="card">
+        <div class="footer-actions">
+          <div>
+            <h2 class="section-title" style="margin-bottom:8px;">issues</h2>
+            <div class="summary-note">add issues one by one. each issue can have up to 4 photos.</div>
+          </div>
+          <button type="button" class="btn btn-secondary" id="addIssueBtn">add issue</button>
+        </div>
+      </div>
+
+      <div id="issuesContainer"></div>
+
+      <div class="card">
+        <div class="footer-actions">
+          <div class="summary-note">
+            before generating, make sure every included issue has a title and a price.<br>
+            the final quote is generated automatically from included items only.
+          </div>
+          <button type="submit" class="btn btn-primary">generate pdf</button>
+        </div>
+      </div>
+    </form>
   </div>
 
-  {% for section in sections %}
-  <div class="card">
-    <div class="section-title">{{ section.name }}</div>
+  <template id="issueTemplate">
+    <div class="issue-card" data-issue-card>
+      <div class="issue-header">
+        <div>
+          <h3 data-issue-title>issue 1</h3>
+          <div class="summary-note">one issue = one mini quote</div>
+        </div>
+        <div class="issue-actions">
+          <span class="pill">issue card</span>
+          <button type="button" class="btn btn-danger" data-remove-issue>remove</button>
+        </div>
+      </div>
 
-    <label>Status</label>
-    <div class="radio-group">
-      <label><input type="radio" name="{{ section.key }}_status" value="Good" required> Good</label>
-      <label><input type="radio" name="{{ section.key }}_status" value="Monitor"> Monitor</label>
-      <label><input type="radio" name="{{ section.key }}_status" value="Needs attention"> Needs attention</label>
-      <label><input type="radio" name="{{ section.key }}_status" value="Not inspected"> Not inspected</label>
+      <div class="grid-3">
+        <div class="field">
+          <label>issue title</label>
+          <input type="text" data-name="title" placeholder="Broken external gate latch" required>
+        </div>
+        <div class="field">
+          <label>location</label>
+          <input type="text" data-name="location" placeholder="Front entry">
+        </div>
+        <div class="field">
+          <label>status</label>
+          <select data-name="status">
+            <option value="urgent">urgent</option>
+            <option value="recommended" selected>recommended</option>
+            <option value="optional">optional</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>observed condition</label>
+          <textarea data-name="observed_condition" placeholder="Describe what was seen during inspection"></textarea>
+        </div>
+        <div class="field">
+          <label>recommended action</label>
+          <textarea data-name="recommended_action" placeholder="Describe the recommended fix"></textarea>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="field">
+          <label>include in final quote</label>
+          <select data-name="include_in_quote">
+            <option value="yes" selected>yes</option>
+            <option value="no">no</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>optional item</label>
+          <select data-name="optional">
+            <option value="no" selected>no</option>
+            <option value="yes">yes</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>item price</label>
+          <input type="text" data-name="price" placeholder="850.00">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>pricing note</label>
+        <input type="text" data-name="pricing_note" value="Includes labour and materials">
+      </div>
+
+      <div class="field">
+        <label>included works</label>
+        <div class="scope-list" data-scope-list></div>
+        <button type="button" class="btn btn-secondary" data-add-scope style="margin-top:12px;">add included work item</button>
+      </div>
+
+      <div class="field">
+        <label>issue photos</label>
+        <input type="file" data-name="photos" accept="image/*" multiple>
+        <div class="hint">maximum 4 photos per issue</div>
+      </div>
     </div>
+  </template>
 
-    <label>Condition summary</label>
-    <input type="text" name="{{ section.key }}_condition" placeholder="Short summary for this section">
+  <template id="scopeTemplate">
+    <div class="scope-row">
+      <input type="text" data-name="scope" placeholder="Supply and install new latch set">
+      <button type="button" class="btn btn-danger" data-remove-scope>remove</button>
+    </div>
+  </template>
 
-    <label>Notes</label>
-    <textarea name="{{ section.key }}_notes" rows="3" placeholder="Detailed observations, defects, recommendations"></textarea>
+  <script>
+    const issuesContainer = document.getElementById("issuesContainer");
+    const issueTemplate = document.getElementById("issueTemplate");
+    const scopeTemplate = document.getElementById("scopeTemplate");
+    const addIssueBtn = document.getElementById("addIssueBtn");
+    const issueCountInput = document.getElementById("issue_count");
 
-    <label>Photos</label>
-    <input class="upload" type="file" name="{{ section.key }}_photos" multiple accept="image/*" capture="environment">
-  </div>
-  {% endfor %}
+    function updateIssueIndexes() {
+      const cards = issuesContainer.querySelectorAll("[data-issue-card]");
 
-  <div class="card">
-    <button type="submit">Generate PDF</button>
-  </div>
+      cards.forEach((card, index) => {
+        const number = index + 1;
+        card.querySelector("[data-issue-title]").textContent = `issue ${number}`;
 
-</form>
+        card.querySelectorAll("[data-name]").forEach((field) => {
+          const key = field.getAttribute("data-name");
+          field.name = `issue_${index}_${key}`;
+        });
+      });
 
-</div>
+      issueCountInput.value = cards.length.toString();
+    }
+
+    function addScopeRow(scopeList) {
+      const scopeFragment = scopeTemplate.content.cloneNode(true);
+      const row = scopeFragment.querySelector(".scope-row");
+
+      row.querySelector("[data-remove-scope]").addEventListener("click", () => {
+        row.remove();
+      });
+
+      scopeList.appendChild(scopeFragment);
+      updateIssueIndexes();
+    }
+
+    function attachIssueEvents(card) {
+      const removeBtn = card.querySelector("[data-remove-issue]");
+      const addScopeBtn = card.querySelector("[data-add-scope]");
+      const scopeList = card.querySelector("[data-scope-list]");
+      const photoInput = card.querySelector('input[type="file"][data-name="photos"]');
+
+      removeBtn.addEventListener("click", () => {
+        card.remove();
+        updateIssueIndexes();
+      });
+
+      addScopeBtn.addEventListener("click", () => {
+        addScopeRow(scopeList);
+      });
+
+      photoInput.addEventListener("change", () => {
+        if (photoInput.files.length > 4) {
+          alert("maximum 4 photos per issue");
+          photoInput.value = "";
+        }
+      });
+
+      addScopeRow(scopeList);
+      updateIssueIndexes();
+    }
+
+    function addIssue() {
+      const fragment = issueTemplate.content.cloneNode(true);
+      const card = fragment.querySelector("[data-issue-card]");
+      issuesContainer.appendChild(fragment);
+      const actualCard = issuesContainer.lastElementChild;
+      attachIssueEvents(actualCard);
+      updateIssueIndexes();
+    }
+
+    addIssueBtn.addEventListener("click", addIssue);
+
+    addIssue();
+  </script>
 </body>
 </html>
