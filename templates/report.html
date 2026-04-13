@@ -11,7 +11,7 @@
       --text:#1F2933;
       --muted:#6B7280;
       --strong:#111827;
-      --blue:#2F6FED;
+      --accent:#2F6FED;
       --urgent-bg:#FEE4E2;
       --urgent-text:#B42318;
       --recommended-bg:#FEF3E2;
@@ -20,6 +20,10 @@
       --optional-text:#344054;
       --radius:8px;
       --shadow:0px 1px 2px rgba(16, 24, 40, 0.05);
+      --space-sm:8px;
+      --space-md:16px;
+      --space-lg:24px;
+      --space-xl:32px;
     }
 
     @page{
@@ -37,11 +41,12 @@
       color:var(--text);
       background:var(--white);
       font-size:10pt;
-      line-height:1.5;
+      line-height:1.55;
     }
 
     .page{
       width:100%;
+      background:var(--white);
     }
 
     .page-break{
@@ -49,147 +54,179 @@
       break-before:page;
     }
 
-    .section-space{
-      height:24px;
+    .section{
+      margin-top:var(--space-xl);
     }
 
     .card{
       background:var(--white);
       border:1px solid var(--border);
       border-radius:var(--radius);
-      padding:18px;
       box-shadow:var(--shadow);
     }
 
     .header{
-      display:flex;
-      justify-content:space-between;
+      display:grid;
+      grid-template-columns:1.4fr 0.8fr;
       gap:24px;
-      align-items:flex-start;
-      padding-bottom:16px;
+      align-items:start;
+      padding:28px 0;
       border-bottom:1px solid var(--border);
     }
 
     .header-left{
       display:flex;
+      align-items:flex-start;
       gap:16px;
-      align-items:center;
     }
 
     .header-logo{
       width:120px;
       height:auto;
       object-fit:contain;
+      flex-shrink:0;
+    }
+
+    .header-text{
+      padding-top:4px;
     }
 
     .header-title{
-      font-size:22pt;
-      line-height:1.1;
-      font-weight:700;
-      color:var(--strong);
       margin:0 0 6px 0;
+      font-size:24pt;
+      line-height:1.08;
+      font-weight:700;
+      color:var(--text);
     }
 
-    .header-subtitle{
-      color:var(--blue);
+    .header-company{
+      margin:0;
       font-size:10pt;
       font-weight:700;
-      margin:0;
+      color:var(--accent);
     }
 
     .header-right{
-      min-width:210px;
       text-align:right;
+      padding-top:4px;
     }
 
-    .meta-line{
-      margin:0 0 6px 0;
+    .meta-block{
+      margin-bottom:14px;
+    }
+
+    .meta-label{
+      display:block;
+      margin:0 0 4px 0;
+      font-size:8.8pt;
       color:var(--muted);
-      font-size:9pt;
+      text-transform:uppercase;
+      letter-spacing:0.03em;
     }
 
-    .meta-line strong{
+    .meta-value{
+      margin:0;
+      font-size:10pt;
       color:var(--strong);
+      font-weight:700;
     }
 
     .company-lines{
-      margin-top:10px;
+      margin-top:14px;
       color:var(--muted);
       font-size:9pt;
-      line-height:1.55;
+      line-height:1.6;
     }
 
     .property-card{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:18px;
+      padding:22px;
     }
 
     .property-address{
-      margin:0 0 14px 0;
-      font-size:16pt;
-      color:var(--strong);
+      margin:0 0 20px 0;
+      font-size:18pt;
+      line-height:1.2;
       font-weight:700;
+      color:var(--strong);
     }
 
     .property-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:8px 24px;
+      gap:14px 28px;
     }
 
-    .info-row{
-      display:grid;
-      grid-template-columns:120px 1fr;
-      gap:8px;
-      align-items:start;
+    .property-item{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
     }
 
-    .label{
-      font-weight:700;
-      color:var(--text);
-    }
-
-    .value{
+    .property-label{
+      font-size:8.8pt;
       color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:0.03em;
+    }
+
+    .property-value{
+      font-size:10pt;
+      color:var(--text);
+      font-weight:700;
     }
 
     .summary-grid{
       display:grid;
       grid-template-columns:repeat(6, 1fr);
-      gap:12px;
+      gap:18px;
+      margin-top:var(--space-xl);
+      margin-bottom:var(--space-xl);
     }
 
     .summary-card{
+      padding:18px 14px;
+      min-height:104px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
       text-align:center;
-      padding:16px 12px;
     }
 
     .summary-number{
+      margin:0 0 10px 0;
       font-size:18pt;
+      line-height:1.1;
       font-weight:700;
       color:var(--strong);
-      margin:0 0 6px 0;
+    }
+
+    .summary-timeframe{
+      font-size:12pt;
+      line-height:1.25;
     }
 
     .summary-label{
-      font-size:9pt;
-      color:var(--muted);
       margin:0;
+      font-size:8.8pt;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:0.03em;
     }
 
     .section-title{
-      margin:0 0 12px 0;
-      font-size:14pt;
+      margin:0 0 var(--space-lg) 0;
+      font-size:16pt;
+      line-height:1.2;
       font-weight:700;
-      color:var(--blue);
+      color:var(--text);
     }
 
     .issue-card{
+      padding:20px;
+      margin-bottom:24px;
       page-break-inside:avoid;
       break-inside:avoid;
-      margin-bottom:18px;
     }
 
     .issue-head{
@@ -197,20 +234,21 @@
       justify-content:space-between;
       align-items:flex-start;
       gap:16px;
-      margin-bottom:8px;
+      margin-bottom:16px;
     }
 
     .issue-title{
       margin:0;
-      font-size:13pt;
-      color:var(--strong);
+      font-size:13.5pt;
+      line-height:1.25;
       font-weight:700;
+      color:var(--strong);
     }
 
     .issue-location{
       margin:6px 0 0 0;
-      color:var(--muted);
       font-size:9pt;
+      color:var(--muted);
     }
 
     .badge{
@@ -218,7 +256,7 @@
       align-items:center;
       justify-content:center;
       border-radius:999px;
-      padding:8px 12px;
+      padding:7px 12px;
       font-size:9pt;
       font-weight:700;
       white-space:nowrap;
@@ -240,17 +278,17 @@
     }
 
     .photos{
-      margin:16px 0 18px 0;
-      gap:10px;
       display:grid;
+      gap:10px;
+      margin:0 0 18px 0;
     }
 
     .photos img{
       width:100%;
       border-radius:8px;
+      border:1px solid var(--border);
       object-fit:cover;
       background:var(--panel);
-      border:1px solid var(--border);
     }
 
     .photos-1{
@@ -283,65 +321,68 @@
 
     .content-label{
       display:block;
+      margin:0 0 6px 0;
+      font-size:10pt;
       font-weight:700;
       color:var(--text);
-      margin-bottom:6px;
     }
 
     .content-text{
-      color:var(--muted);
       margin:0;
+      color:var(--muted);
+      font-size:9.7pt;
+      line-height:1.6;
     }
 
     .scope-list{
       margin:0;
       padding-left:18px;
       color:var(--muted);
+      font-size:9.7pt;
+      line-height:1.6;
     }
 
     .scope-list li{
       margin-bottom:4px;
     }
 
-    .price-box{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:8px;
-      padding:14px 16px;
+    .price-wrap{
       margin-top:8px;
     }
 
     .price-label{
-      font-weight:700;
-      color:var(--text);
-      margin-bottom:6px;
+      display:block;
+      margin:0 0 6px 0;
+      font-size:9pt;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:0.03em;
     }
 
     .price-value{
-      font-size:18pt;
+      margin:0 0 4px 0;
+      font-size:19pt;
+      line-height:1.1;
       font-weight:700;
       color:var(--strong);
-      margin:0 0 4px 0;
     }
 
     .price-note{
-      color:var(--muted);
-      font-size:9pt;
       margin:0;
+      font-size:9pt;
+      color:var(--muted);
     }
 
     .quote-line{
-      margin-top:14px;
-      padding-top:12px;
+      margin-top:16px;
+      padding-top:14px;
       border-top:1px solid var(--border);
-      color:var(--blue);
-      font-weight:700;
-      font-size:9.5pt;
+      font-size:9pt;
+      color:var(--muted);
     }
 
-    .table-card{
-      padding:0;
-      overflow:hidden;
+    .quote-card{
+      padding:20px;
     }
 
     table{
@@ -355,15 +396,16 @@
       text-align:left;
       font-size:9pt;
       color:var(--text);
+      font-weight:700;
       border-bottom:1px solid var(--border);
     }
 
     tbody td{
-      padding:12px 14px;
+      padding:13px 14px;
       vertical-align:top;
-      border-bottom:1px solid var(--border);
+      font-size:9.3pt;
       color:var(--muted);
-      font-size:9pt;
+      border-bottom:1px solid #EEF1F4;
     }
 
     tbody tr:last-child td{
@@ -377,9 +419,9 @@
     }
 
     .totals{
-      margin-top:18px;
+      margin-top:24px;
       margin-left:auto;
-      width:340px;
+      width:360px;
     }
 
     .total-row{
@@ -388,7 +430,8 @@
       gap:16px;
       padding:10px 0;
       border-bottom:1px solid var(--border);
-      color:var(--text);
+      font-size:10pt;
+      color:var(--muted);
     }
 
     .total-row strong{
@@ -396,37 +439,41 @@
     }
 
     .grand-total{
-      margin-top:12px;
-      padding:16px;
+      margin-top:14px;
+      padding:18px;
       border:1px solid var(--border);
       border-radius:8px;
-      background:var(--panel);
+      background:var(--white);
+      box-shadow:var(--shadow);
     }
 
     .grand-total-label{
       margin:0 0 8px 0;
-      color:var(--text);
-      font-weight:700;
+      font-size:9pt;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:0.03em;
     }
 
     .grand-total-value{
       margin:0;
-      font-size:20pt;
+      font-size:22pt;
+      line-height:1.1;
       color:var(--strong);
       font-weight:700;
     }
 
     .timeframe-line{
-      margin-top:18px;
+      margin-top:24px;
       font-size:10pt;
       color:var(--text);
     }
 
     .closing-note{
       margin-top:16px;
-      color:var(--muted);
       font-size:9.5pt;
-      line-height:1.6;
+      color:var(--muted);
+      line-height:1.65;
     }
   </style>
 </head>
@@ -437,204 +484,251 @@
         {% if logo_url %}
         <img src="{{ logo_url }}" alt="Logo" class="header-logo">
         {% endif %}
-        <div>
+        <div class="header-text">
           <h1 class="header-title">inspection &amp; maintenance report</h1>
-          <p class="header-subtitle">{{ company_name or "Class A Fix" }}</p>
+          <p class="header-company">{{ company_name or "Class A Fix" }}</p>
+
+          {% if company_phone or company_email or company_website or company_abn %}
           <div class="company-lines">
             {% if company_phone %}<div>{{ company_phone }}</div>{% endif %}
             {% if company_email %}<div>{{ company_email }}</div>{% endif %}
             {% if company_website %}<div>{{ company_website }}</div>{% endif %}
             {% if company_abn %}<div>ABN {{ company_abn }}</div>{% endif %}
           </div>
+          {% endif %}
         </div>
       </div>
 
       <div class="header-right">
-        <p class="meta-line"><strong>report reference</strong><br>{{ report_reference }}</p>
-        <p class="meta-line"><strong>date</strong><br>{{ generated_date }}</p>
+        <div class="meta-block">
+          <span class="meta-label">report reference</span>
+          <p class="meta-value">{{ report_reference }}</p>
+        </div>
+        <div class="meta-block">
+          <span class="meta-label">date</span>
+          <p class="meta-value">{{ generated_date }}</p>
+        </div>
       </div>
     </div>
 
-    <div class="section-space"></div>
+    <div class="section">
+      <div class="card property-card">
+        <h2 class="property-address">{{ property_address }}</h2>
 
-    <div class="property-card">
-      <h2 class="property-address">{{ property_address }}</h2>
-      <div class="property-grid">
-        <div class="info-row"><div class="label">agency</div><div class="value">{{ agency or "-" }}</div></div>
-        <div class="info-row"><div class="label">requested by</div><div class="value">{{ requested_by or "-" }}</div></div>
-        <div class="info-row"><div class="label">work order</div><div class="value">{{ work_order or "-" }}</div></div>
-        <div class="info-row"><div class="label">inspection date</div><div class="value">{{ inspection_date or "-" }}</div></div>
-        <div class="info-row"><div class="label">priority</div><div class="value">{{ priority or "-" }}</div></div>
-        <div class="info-row"><div class="label">client name</div><div class="value">{{ client_name or "-" }}</div></div>
-        <div class="info-row"><div class="label">tenant name</div><div class="value">{{ tenant_name or "-" }}</div></div>
-        <div class="info-row"><div class="label">job number</div><div class="value">{{ job_number or "-" }}</div></div>
+        <div class="property-grid">
+          <div class="property-item">
+            <span class="property-label">agency</span>
+            <span class="property-value">{{ agency or "-" }}</span>
+          </div>
+
+          <div class="property-item">
+            <span class="property-label">requested by</span>
+            <span class="property-value">{{ requested_by or "-" }}</span>
+          </div>
+
+          <div class="property-item">
+            <span class="property-label">work order</span>
+            <span class="property-value">{{ work_order or "-" }}</span>
+          </div>
+
+          <div class="property-item">
+            <span class="property-label">inspection date</span>
+            <span class="property-value">{{ inspection_date or "-" }}</span>
+          </div>
+
+          <div class="property-item">
+            <span class="property-label">priority</span>
+            <span class="property-value">{{ priority or "-" }}</span>
+          </div>
+
+          <div class="property-item">
+            <span class="property-label">client name</span>
+            <span class="property-value">{{ client_name or "-" }}</span>
+          </div>
+
+          <div class="property-item">
+            <span class="property-label">tenant name</span>
+            <span class="property-value">{{ tenant_name or "-" }}</span>
+          </div>
+
+          <div class="property-item">
+            <span class="property-label">job number</span>
+            <span class="property-value">{{ job_number or "-" }}</span>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="section-space"></div>
 
     <div class="summary-grid">
       <div class="card summary-card">
         <p class="summary-number">{{ total_issues }}</p>
         <p class="summary-label">total issues</p>
       </div>
+
       <div class="card summary-card">
         <p class="summary-number">{{ urgent_count }}</p>
         <p class="summary-label">urgent</p>
       </div>
+
       <div class="card summary-card">
         <p class="summary-number">{{ recommended_count }}</p>
         <p class="summary-label">recommended</p>
       </div>
+
       <div class="card summary-card">
         <p class="summary-number">{{ optional_count }}</p>
         <p class="summary-label">optional</p>
       </div>
+
       <div class="card summary-card">
         <p class="summary-number">{{ total_estimated_cost }}</p>
         <p class="summary-label">total estimate</p>
       </div>
+
       <div class="card summary-card">
-        <p class="summary-number" style="font-size:13pt;">{{ estimated_timeframe }}</p>
+        <p class="summary-number summary-timeframe">{{ estimated_timeframe }}</p>
         <p class="summary-label">timeframe</p>
       </div>
     </div>
 
-    <div class="section-space" style="height:32px;"></div>
+    <div class="section">
+      <h2 class="section-title">issue details</h2>
 
-    <h2 class="section-title">issue details</h2>
-
-    {% for issue in issues %}
-    <div class="card issue-card">
-      <div class="issue-head">
-        <div>
-          <h3 class="issue-title">Issue {{ issue.number }}: {{ issue.title }}</h3>
-          <p class="issue-location">{{ issue.location }}</p>
+      {% for issue in issues %}
+      <div class="card issue-card">
+        <div class="issue-head">
+          <div>
+            <h3 class="issue-title">Issue {{ issue.number }}: {{ issue.title }}</h3>
+            <p class="issue-location">{{ issue.location }}</p>
+          </div>
+          <span class="badge {{ issue.status_style }}">{{ issue.status }}</span>
         </div>
-        <span class="badge {{ issue.status_style }}">{{ issue.status }}</span>
-      </div>
 
-      {% if issue.photos %}
-      <div class="photos {{ issue.photo_layout }}">
-        {% for photo in issue.photos %}
-        <img src="{{ photo }}" alt="Issue photo {{ loop.index }}">
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <div class="content-block">
-        <span class="content-label">Observed condition</span>
-        <p class="content-text">{{ issue.observed_condition }}</p>
-      </div>
-
-      <div class="content-block">
-        <span class="content-label">Recommended action</span>
-        <p class="content-text">{{ issue.recommended_action }}</p>
-      </div>
-
-      <div class="content-block">
-        <span class="content-label">Included works</span>
-        {% if issue.scope_items %}
-        <ul class="scope-list">
-          {% for item in issue.scope_items %}
-          <li>{{ item }}</li>
+        {% if issue.photos %}
+        <div class="photos {{ issue.photo_layout }}">
+          {% for photo in issue.photos %}
+          <img src="{{ photo }}" alt="Issue photo {{ loop.index }}">
           {% endfor %}
-        </ul>
-        {% else %}
-        <p class="content-text">No included works listed.</p>
+        </div>
         {% endif %}
-      </div>
 
-      <div class="content-block">
-        <span class="content-label">Item price</span>
-        <div class="price-box">
+        <div class="content-block">
+          <span class="content-label">Observed condition</span>
+          <p class="content-text">{{ issue.observed_condition }}</p>
+        </div>
+
+        <div class="content-block">
+          <span class="content-label">Recommended action</span>
+          <p class="content-text">{{ issue.recommended_action }}</p>
+        </div>
+
+        <div class="content-block">
+          <span class="content-label">Included works</span>
+          {% if issue.scope_items %}
+          <ul class="scope-list">
+            {% for item in issue.scope_items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="content-text">No included works listed.</p>
+          {% endif %}
+        </div>
+
+        <div class="price-wrap">
+          <span class="price-label">item price</span>
           <p class="price-value">{{ issue.price }}</p>
           <p class="price-note">{{ issue.pricing_note }}</p>
         </div>
-      </div>
 
-      <div class="quote-line">{{ issue.quote_status_text }}</div>
+        <div class="quote-line">{{ issue.quote_status_text }}</div>
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
 
     <div class="page-break"></div>
 
-    <h2 class="section-title">combined quote summary</h2>
+    <div class="section" style="margin-top:0;">
+      <h2 class="section-title">combined quote summary</h2>
 
-    <div class="card table-card">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:18%;">item</th>
-            <th>description</th>
-            <th style="width:20%;">location</th>
-            <th style="width:14%;">price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in included_quote_items %}
-          <tr>
-            <td>{{ item.item }}</td>
-            <td>{{ item.description }}</td>
-            <td>{{ item.location }}</td>
-            <td class="table-price">{{ item.price }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    {% if has_optional_items %}
-    <div class="section-space"></div>
-    <h2 class="section-title">optional items</h2>
-
-    <div class="card table-card">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:18%;">item</th>
-            <th>description</th>
-            <th style="width:20%;">location</th>
-            <th style="width:14%;">price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in optional_quote_items %}
-          <tr>
-            <td>{{ item.item }}</td>
-            <td>{{ item.description }}</td>
-            <td>{{ item.location }}</td>
-            <td class="table-price">{{ item.price }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% endif %}
-
-    <div class="totals">
-      <div class="total-row">
-        <span>subtotal</span>
-        <strong>{{ subtotal }}</strong>
+      <div class="card quote-card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:18%;">item</th>
+              <th>description</th>
+              <th style="width:20%;">location</th>
+              <th style="width:14%;">price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in included_quote_items %}
+            <tr>
+              <td>{{ item.item }}</td>
+              <td>{{ item.description }}</td>
+              <td>{{ item.location }}</td>
+              <td class="table-price">{{ item.price }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
+
       {% if has_optional_items %}
-      <div class="total-row">
-        <span>optional subtotal</span>
-        <strong>{{ optional_subtotal }}</strong>
+      <div class="section">
+        <h2 class="section-title">optional items</h2>
+
+        <div class="card quote-card">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:18%;">item</th>
+                <th>description</th>
+                <th style="width:20%;">location</th>
+                <th style="width:14%;">price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in optional_quote_items %}
+              <tr>
+                <td>{{ item.item }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.location }}</td>
+                <td class="table-price">{{ item.price }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
       {% endif %}
-      <div class="grand-total">
-        <p class="grand-total-label">TOTAL ESTIMATED COST</p>
-        <p class="grand-total-value">{{ total_estimated_cost }}</p>
+
+      <div class="totals">
+        <div class="total-row">
+          <span>subtotal</span>
+          <strong>{{ subtotal }}</strong>
+        </div>
+
+        {% if has_optional_items %}
+        <div class="total-row">
+          <span>optional subtotal</span>
+          <strong>{{ optional_subtotal }}</strong>
+        </div>
+        {% endif %}
+
+        <div class="grand-total">
+          <p class="grand-total-label">total estimated cost</p>
+          <p class="grand-total-value">{{ total_estimated_cost }}</p>
+        </div>
       </div>
-    </div>
 
-    <div class="timeframe-line">
-      <strong>estimated timeframe:</strong> {{ estimated_timeframe }}
-    </div>
+      <div class="timeframe-line">
+        <strong>estimated timeframe:</strong> {{ estimated_timeframe }}
+      </div>
 
-    <div class="closing-note">
-      pricing is based on the inspection completed at the time of reporting. costs may vary if additional issues are found once works commence or concealed conditions are uncovered during repairs.
+      <div class="closing-note">
+        pricing is based on the inspection completed at the time of reporting. costs may vary if additional issues are found once works commence or concealed conditions are uncovered during repairs.
+      </div>
     </div>
   </div>
 </body>
